@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Réseau Discord Artivain</title>
+	<link rel="shortcut icon" href="https://assets.artivain.com/fav/bots/ra-512.png">
+
+	<!-- The page supports both dark and light color schemes, and the default is light. -->
+	<meta name="color-scheme" content="light dark">
+
+	<script>
+		if (window.matchMedia("(prefers-color-scheme: dark)").media === "not all") {
+			document.documentElement.style.display = "none";
+			document.head.insertAdjacentHTML(
+				"beforeend",
+				"<link id=\"css\" rel=\"stylesheet\" href=\"/css/flatly-light.min.css\" onload=\"document.documentElement.style.display = ''\">"
+			);
+		}
+	</script>
+
+	<link rel="stylesheet" href="/css/flatly-dark.min.css" media="(prefers-color-scheme: dark)">
+	<link rel="stylesheet" href="/css/flatly-light.min.css" media="(prefers-color-scheme: light)">
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark position-fixed top-0 w-100 bg-dark">
+		<div class="container">
+			<a class="navbar-brand" href="#">
+				<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="navbar-logo" alt="Logo">
+				Réseau Discord Artivain
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+				aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="#">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="api">API</a>
+					</li>
+					<li class="nav-item">
+						<a href="https://discord.artivain.com" class="nav-link">Discord server</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid text-center text-white bg-dark py-5">
+		<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="img-fluid mw-200" alt="Logo">
+		<h1>Réseau Discord Artivain</h1>
+	</div>
+
+	<div class="container my-5">
+		<h2>What is this project?</h2>
+
+		<p>
+			The réseau Discord Artivain (or réseau Artivain in short, which would translate to "Artivain network") project is
+			a collaboration between multiple partnered Discord servers to boost their security, and to work together on many
+			projects.
+		</p>
+
+		<h3>How does it work?</h3>
+
+		<p>
+			By sharing the lists of possibly dangerous Discord accounts, it helps other servers to be warned when a reported
+			user joins them. The more Discord servers contributing, the better the security is against raids, scammers,
+			unwanted advertisements and spam. Everyone can use our data, through the public API. You don't even need an
+			authentification key! The goal is not to replace the other existing security methods, but to add a new layer of
+			protection. It is simple and free to integrate our database with your Discord bot!
+		</p>
+
+		<h3>The lists</h3>
+		<p>
+			There are 2 lists in the official database: the suspects list and the blacklist.
+		</p>
+
+		<div class="row">
+			<div class="col-md-6">
+				<h4>Suspects list</h4>
+				<p>
+					This list contains the most accounts. It contains accounts suspected of doing at least one of the following:
+				</p>
+				<ul>
+					<li>Selfbot</li>
+					<li>Spam</li>
+					<li>Unauthorized advertising</li>
+					<li>Direct message advertisement</li>
+					<li>Participate in dangerous Discord server</li>
+				</ul>
+				<p>
+					We do not recommend to automatically ban people on this list. The best way would be to notify your moderation
+					team when an account on the list join to watch it more.
+				</p>
+			</div>
+			<div class="col-md-6">
+				<h4>Blacklist</h4>
+				<p>
+					This list contains the most dangerous accounts in our database. Most of the servers that are members of the
+					réseau Artivain automatically ban these accounts. We do more manual checkups on this list to make sure there
+					is no false-positive: every account is manually verified and a proof must be given to add the account. The
+					accounts on this list are guilty of at least one of the following:
+				</p>
+				<ul>
+					<li>Selfbot</li>
+					<li>Abusive advertising</li>
+					<li>Server raid</li>
+					<li>Piracy / Phishing</li>
+					<li>Active in dangerous Discord server</li>
+					<li>Violation of copyright</li>
+					<li>Violation of open-source licence</li>
+				</ul>
+			</div>
+		</div>
+
+		<h3>In action</h3>
+		<div class="row">
+			<div class="col-md-6">
+				<figure class="figure">
+					<img src="/img/autoban-fr.webp" alt="Automatic ban of a dangerous account"
+						class="img-fluid figure-img rounded">
+					<figcaption class="figure-caption">Dangerous account automatically banned by a Discord bot</figcaption>
+				</figure>
+
+			</div>
+			<div class="col-md-6">
+				<figure class="figure">
+					<img src="/img/suspect-added-fr.webp" alt="An account has been added to the suspects list"
+						class="img-fluid figure-img rounded">
+					<figcaption class="figure-caption">Discord bot warning réseau Artivain's moderation team that an account has been reported</figcaption>
+				</figure>
+			</div>
+		</div>
+
+		<h3>Members et contributors</h3>
+		<div id="carousel" class="carousel slide bg-dark rounded p-3 mt-3" data-bs-ride="carousel">
+			<div class="carousel-inner">
+				<div class="carousel-item active">
+					<img src="/img/carousel-artivain-founder.webp" class="d-block mx-auto mb-5 pb-5 px-5 img-fluid"
+						alt="Artivain logo">
+					<div class="carousel-caption d-block pb-0">
+						<h4>Artivain</h4>
+						<p class="mb-0">Founder of the project</p>
+						<a href="https://artivain.com" target="_blank" rel="noopener noreferrer">artivain.com</a>
+					</div>
+				</div>
+				<div class="carousel-item">
+					<img src="/img/carousel-eclipium-member.webp" class="d-block mx-auto mb-5 pb-5 px-5 img-fluid"
+						alt="Eclipium logo">
+					<div class="carousel-caption d-block pb-0">
+						<h4>Eclipium</h4>
+						<p class="mb-0">Founding Member</p>
+						<a href="https://eclipium.xyz" target="_blank" rel="noopener noreferrer">eclipium.xyz</a>
+					</div>
+				</div>
+				<div class="carousel-item">
+					<img src="/img/carousel-snake-team-member.webp" class="d-block mx-auto mb-5 pb-5 px-5 img-fluid"
+						alt="Snake Team logo">
+					<div class="carousel-caption d-block pb-0">
+						<h4>Snake Team</h4>
+						<p class="mb-0">Member</p>
+						<a href="https://snaketeam.tk" target="_blank" rel="noopener noreferrer">snaketeam.tk</a>
+					</div>
+				</div>
+			</div>
+			<button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
+
+	</div>
+
+	<footer id="footer" class="bg-dark py-3">
+		<div class="container d-md-flex justify-content-between text-center text-white">
+			<div>&copy; <a class="link-light" href="https://artivain.com">Artivain</a> <span id="year"></span></div>
+			<div>This website is licensed under <a class="link-light" href="/LICENSE">MIT license</a></div>
+			<div><a class="link-light" href="https://github.com/Artivain/reseau-discord-website">See on GitHub</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+		crossorigin="anonymous"></script>
+
+	<script>
+		document.getElementById("year").innerText = new Date().getFullYear();
+	</script>
+</body>
+
+</html>
