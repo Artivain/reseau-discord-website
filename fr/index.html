@@ -63,8 +63,21 @@
 	</div>
 
 	<div class="container my-5">
-		<h2>À propos</h2>
 
+		<div class="container bg-dark my-5 p-md-5 text-white text-center rounded">
+			<h2>Tester un compte</h2>
+			<form action="javascript:checkAccount()" id="check-account">
+				<div class="input-group m-3 justify-content-center">
+					<input type="text" class="form-control mw-300" id="discord-id" placeholder="ID Discord" required>
+					<input class="btn btn-primary" type="submit" value="Vérifier" id="submit">
+				</div>
+			</form>
+			<div id="check-account-result" style="display: none;">
+
+			</div>
+		</div>
+
+		<h2>À propos</h2>
 		<p>
 			Le réseau Discord Artivain (ou réseau Artivain tout court) est une collaboration entre plusieurs serveurs Discord
 			partenaires pour améliorer la sécurité de ceux-ci, en plus de collaborer sur des projets.
@@ -196,6 +209,47 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 		crossorigin="anonymous"></script>
+
+	<script>
+		async function checkAccount() {
+			const userId = document.getElementById("discord-id").value;
+			const submit = document.getElementById("submit");
+			const result = document.getElementById("check-account-result");
+			loadingAnimation({ element: submit });
+
+			if (!isValidId(userId)) {
+				loadingAnimation({ isLoading: false, string: "Vérifier", element: submit });
+				return checkError("Vous devez entrer un ID Discord valide.");
+			}
+
+			const response = await fetch(`https://api-ra.artivain.com/v1/check?id=${userId}`);
+			const { suslist, blacklist } = await response.json();
+
+			result.innerText(`SUS: ${JSON.stringify(suslist)}\n\nBL: ${JSON.stringify(blacklist)}`);
+			loadingAnimation({ isLoading: false, string: "Vérifier", element: submit });
+		}
+
+		function loadingAnimation({ isLoading = true, string = "", element }) {
+			if (!element || typeof element == "object") return new Error("Element parameter unset or invalid.");
+
+			if (isLoading) {
+				const spinner = `
+				<div class="spinner-grow" role="status">
+					<span class="visually-hidden">Chargement...</span>
+				</div>
+				`;
+
+				element.innerHTML = spinner;
+			} else {
+				element.innerText = string;
+			}
+		}
+
+		function isValidId(id) {
+			if (isNaN(id) || id.length < 18) return false;
+			return true;
+		}
+	</script>
 
 	<script>
 		document.getElementById("year").innerText = new Date().getFullYear();
