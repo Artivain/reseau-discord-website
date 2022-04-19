@@ -57,7 +57,7 @@
 		</div>
 	</nav>
 
-	<div class="container-fluid text-center text-white bg-dark py-5">
+	<div class="container-fluid text-center text-white bg-dark py-5 mt-3">
 		<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="img-fluid mw-200" alt="Logo">
 		<h1>Réseau Discord Artivain</h1>
 	</div>
@@ -69,11 +69,12 @@
 			<form action="javascript:checkAccount()" id="check-account">
 				<div class="input-group m-3 justify-content-center">
 					<input type="text" class="form-control mw-300" id="discord-id" placeholder="ID Discord" required>
-					<input class="btn btn-primary" type="submit" value="Vérifier" id="submit">
+					<button class="btn btn-primary" type="submit" id="submit">Vérifier</button>
 				</div>
 			</form>
-			<div id="check-account-result" style="display: none;">
-
+			<div id="result" class="row mt-5" style="display: none;">
+				<div class="col-md-6" id="result-suspect"></div>
+				<div class="col-md-6" id="result-blacklist"></div>
 			</div>
 		</div>
 
@@ -214,33 +215,85 @@
 		async function checkAccount() {
 			const userId = document.getElementById("discord-id").value;
 			const submit = document.getElementById("submit");
-			const result = document.getElementById("check-account-result");
+			const result = document.getElementById("result");
+			const resultSuspect = document.getElementById("result-suspect");
+			const resultBlacklist = document.getElementById("result-blacklist");
 			loadingAnimation({ element: submit });
 
 			if (!isValidId(userId)) {
 				loadingAnimation({ isLoading: false, string: "Vérifier", element: submit });
-				return checkError("Vous devez entrer un ID Discord valide.");
+				return alert("Vous devez entrer un ID Discord valide.");
 			}
 
-			const response = await fetch(`https://api-ra.artivain.com/v1/check?id=${userId}`);
-			const { suslist, blacklist } = await response.json();
+			const response = await fetch(`https://api-rd.artivain.com/v1/check?id=${userId}`);
 
-			result.innerText(`SUS: ${JSON.stringify(suslist)}\n\nBL: ${JSON.stringify(blacklist)}`);
+			if (response.status == 400) {
+				loadingAnimation({ isLoading: false, string: "Vérifier", element: submit });
+				return alert("Le ID Discord n'est pas valide!");
+			}
+
+			if (response.status != 200) {
+				loadingAnimation({ isLoading: false, string: "Vérifier", element: submit });
+				return alert("Une erreur est survenue.");
+			}
+
+			const { suspect, blacklist } = await response.json();
+
+			if (suspect) {
+				let date = new Date(suspect.since);
+				resultSuspect.innerHTML = `
+				<h3>Liste des suspects</h3>
+				<p class="text-warning">
+					Ce compte est sur la liste!<br>
+					Ajouté par ${suspect.addedBy} le ${date.toLocaleString()}
+				</p>
+				</ul>
+				<p>Fausse alerte?<br>Signalez-le sur notre serveur Discord!</p>
+				`;
+			} else {
+				resultSuspect.innerHTML = `
+				<h3>Liste des suspects</h3>
+				<p class="text-success">Ce compte n'est pas sur la liste.</p>
+				<p>Il devrait l'être?<br>Vous pouvez nous le signaler sur notre serveur Discord!</p>
+				`;
+			}
+			
+			if (blacklist) {
+				let date = new Date(blacklist.since);
+				resultBlacklist.innerHTML = `
+				<h3>Blacklist</h3>
+				<p class="text-danger">
+					Ce compte est sur la liste!<br>
+					Ajouté par ${blacklist.addedBy} le ${date.toLocaleString()}
+				</p>
+				</ul>
+				<p>Fausse alerte?<br>Signalez-le sur notre serveur Discord!</p>
+				`;
+			} else {
+				resultBlacklist.innerHTML = `
+				<h3>Blacklist</h3>
+				<p class="text-success">Ce compte n'est pas sur la liste.</p>
+				<p>Il devrait l'être?<br>Vous pouvez nous le signaler sur notre serveur Discord!</p>
+				`;
+			}
+
+			result.style.display = "";
 			loadingAnimation({ isLoading: false, string: "Vérifier", element: submit });
 		}
 
 		function loadingAnimation({ isLoading = true, string = "", element }) {
-			if (!element || typeof element == "object") return new Error("Element parameter unset or invalid.");
+			if (!element || typeof element != "object") throw new Error("Element parameter unset or invalid.");
 
 			if (isLoading) {
 				const spinner = `
-				<div class="spinner-grow" role="status">
-					<span class="visually-hidden">Chargement...</span>
-				</div>
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				<span class="visually-hidden">Chargement...</span>
 				`;
 
+				element.disabled = true;
 				element.innerHTML = spinner;
 			} else {
+				element.disabled = false;
 				element.innerText = string;
 			}
 		}

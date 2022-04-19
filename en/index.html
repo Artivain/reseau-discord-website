@@ -57,14 +57,27 @@
 		</div>
 	</nav>
 
-	<div class="container-fluid text-center text-white bg-dark py-5">
+	<div class="container-fluid text-center text-white bg-dark py-5 mt-3">
 		<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="img-fluid mw-200" alt="Logo">
 		<h1>Réseau Discord Artivain</h1>
 	</div>
 
 	<div class="container my-5">
-		<h2>What is this project?</h2>
+		<div class="container bg-dark my-5 p-md-5 text-white text-center rounded">
+			<h2>Check an account</h2>
+			<form action="javascript:checkAccount()" id="check-account">
+				<div class="input-group m-3 justify-content-center">
+					<input type="text" class="form-control mw-300" id="discord-id" placeholder="Discord ID" required>
+					<button class="btn btn-primary" type="submit" id="submit">Verify</button>
+				</div>
+			</form>
+			<div id="result" class="row mt-5" style="display: none;">
+				<div class="col-md-6" id="result-suspect"></div>
+				<div class="col-md-6" id="result-blacklist"></div>
+			</div>
+		</div>
 
+		<h2>What is this project?</h2>
 		<p>
 			The réseau Discord Artivain (or réseau Artivain in short, which would translate to "Artivain network") project is
 			a collaboration between multiple partnered Discord servers to boost their security, and to work together on many
@@ -198,6 +211,99 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 		crossorigin="anonymous"></script>
+
+	<script>
+		async function checkAccount() {
+			const userId = document.getElementById("discord-id").value;
+			const submit = document.getElementById("submit");
+			const result = document.getElementById("result");
+			const resultSuspect = document.getElementById("result-suspect");
+			const resultBlacklist = document.getElementById("result-blacklist");
+			loadingAnimation({ element: submit });
+
+			if (!isValidId(userId)) {
+				loadingAnimation({ isLoading: false, string: "Verify", element: submit });
+				return alert("Vous devez entrer un ID Discord valide.");
+			}
+
+			const response = await fetch(`https://api-rd.artivain.com/v1/check?id=${userId}`);
+
+			if (response.status == 400) {
+				loadingAnimation({ isLoading: false, string: "Verify", element: submit });
+				return alert("The Discord ID is not valid!");
+			}
+
+			if (response.status != 200) {
+				loadingAnimation({ isLoading: false, string: "Verify", element: submit });
+				return alert("An error occurred.");
+			}
+
+			const { suspect, blacklist } = await response.json();
+
+			if (suspect) {
+				let date = new Date(suspect.since);
+				resultSuspect.innerHTML = `
+					<h3>Suspects list</h3>
+					<p class="text-warning">
+						The account is on the list!<br>
+						Added by ${suspect.addedBy} on ${date.toLocaleString()}
+					</p>
+					</ul>
+					<p>False-positive?<br>Report id on our Discord server!</p>
+					`;
+			} else {
+				resultSuspect.innerHTML = `
+				<h3>Suspects list</h3>
+					<p class="text-success">The account is not on the list.</p>
+					<p>It should be?<br>Report is on our Discord server!</p>
+					`;
+			}
+
+			if (blacklist) {
+				let date = new Date(blacklist.since);
+				resultBlacklist.innerHTML = `
+					<h3>Blacklist</h3>
+					<p class="text-danger">
+						The account is on the list!<br>
+						Added by ${blacklist.addedBy} on ${date.toLocaleString()}
+					</p>
+					</ul>
+					<p>False-positive?<br>Report id on our Discord server!</p>
+					`;
+			} else {
+				resultBlacklist.innerHTML = `
+					<h3>Blacklist</h3>
+					<p class="text-success">The account is not on the list.</p>
+					<p>It should be?<br>Report is on our Discord server!</p>
+					`;
+			}
+
+			result.style.display = "";
+			loadingAnimation({ isLoading: false, string: "Verify", element: submit });
+		}
+
+		function loadingAnimation({ isLoading = true, string = "", element }) {
+			if (!element || typeof element != "object") throw new Error("Element parameter unset or invalid.");
+
+			if (isLoading) {
+				const spinner = `
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+					<span class="visually-hidden">Loading...</span>
+					`;
+
+				element.disabled = true;
+				element.innerHTML = spinner;
+			} else {
+				element.disabled = false;
+				element.innerText = string;
+			}
+		}
+
+		function isValidId(id) {
+			if (isNaN(id) || id.length < 18) return false;
+			return true;
+		}
+	</script>
 
 	<script>
 		document.getElementById("year").innerText = new Date().getFullYear();

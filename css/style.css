@@ -13,3 +13,7 @@
 .mw-300 {
 	max-width: 300px;
 }
+
+.navbar {
+	z-index: 999;
+}
