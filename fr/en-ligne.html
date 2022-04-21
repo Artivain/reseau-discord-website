@@ -103,7 +103,7 @@
 
 				<input type="password" class="form-control mb-3" id="token" placeholder="Code d'authentification" required>
 
-				<button class="btn btn-primary w-100" type="submit" id="submit">Ajouter</button>
+				<button class="btn btn-primary w-100" type="submit" id="submit">Exécuter</button>
 			</form>
 			<div id="result" class="mx-auto text-start"></div>
 		</div>
@@ -205,7 +205,7 @@
 			result.prepend(alert);
 		}
 
-		function loadingAnimation({ isLoading = true, string = "Ajouter", element }) {
+		function loadingAnimation({ isLoading = true, string = "Exécuter", element }) {
 			if (!element || typeof element != "object") throw new Error("Element parameter unset or invalid.");
 
 			if (isLoading) {
