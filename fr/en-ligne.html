@@ -136,7 +136,7 @@
 
 			if (!isValidId(userId)) {
 				loadingAnimation({ isLoading: false, element: submit });
-				return createAlert("Le ID Discord n'est pas valide.");
+				return createAlert("Le ID Discord n'est pas valide.", "warning");
 			}
 
 			if (list != "suspect" && list != "blacklist") {
