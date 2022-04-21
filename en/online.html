@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Réseau Discord Artivain</title>
+	<link rel="shortcut icon" href="https://assets.artivain.com/fav/bots/ra-512.png">
+
+	<!-- The page supports both dark and light color schemes, and the default is light. -->
+	<meta name="color-scheme" content="light dark">
+
+	<script>
+		if (window.matchMedia("(prefers-color-scheme: dark)").media === "not all") {
+			document.documentElement.style.display = "none";
+			document.head.insertAdjacentHTML(
+				"beforeend",
+				"<link id=\"css\" rel=\"stylesheet\" href=\"/css/flatly-light.min.css\" onload=\"document.documentElement.style.display = ''\">"
+			);
+		}
+	</script>
+
+	<link rel="stylesheet" href="/css/flatly-dark.min.css" media="(prefers-color-scheme: dark)">
+	<link rel="stylesheet" href="/css/flatly-light.min.css" media="(prefers-color-scheme: light)">
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark position-fixed top-0 w-100 bg-dark">
+		<div class="container">
+			<a class="navbar-brand" href="#">
+				<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="navbar-logo" alt="Logo">
+				Réseau Discord Artivain
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+				aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" href="/en">Home</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="#">Online tool</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="api">API</a>
+					</li>
+					<li class="nav-item">
+						<a href="https://discord.artivain.com" class="nav-link">Discord server</a>
+					</li>
+					<li class="nav-item">
+						<a href="/fr/" class="nav-link">Français</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid text-center text-white bg-dark py-5 mt-3">
+		<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="img-fluid mw-200" alt="Logo">
+		<h1>Réseau Discord Artivain</h1>
+	</div>
+
+	<div class="container my-5">
+
+		<h2>Online tool</h2>
+		<p>
+			This simple tool allows members to easily interact with the API.
+		</p>
+		<p>
+			You don't have a token? Claim it now by joining the réseau Artivain! Contact us on our Discord server.
+		</p>
+
+		<div class="container bg-dark my-5 p-md-5 text-white text-center rounded">
+			<form action="javascript:reportAccount()" id="check-account" class="mw-300 mx-auto">
+				<input type="text" class="form-control mb-3" id="discord-id" placeholder="Discord ID" required>
+
+				<div class="btn-group w-100 mb-3">
+					<input type="radio" class="btn-check" name="report-type" id="report-type-suspect" value="suspect"
+						autocomplete="off" required>
+					<label class="btn btn-outline-warning" for="report-type-suspect">Suspect</label>
+
+					<input type="radio" class="btn-check" name="report-type" id="report-type-blacklist" value="blacklist"
+						autocomplete="off">
+					<label class="btn btn-outline-danger" for="report-type-blacklist">Blacklist</label>
+				</div>
+
+				<div class="btn-group w-100 mb-3">
+					<input type="radio" class="btn-check" name="action" id="action-add" value="add"
+						autocomplete="off" required>
+					<label class="btn btn-outline-light" for="action-add">Add</label>
+
+					<input type="radio" class="btn-check" name="action" id="action-remove" value="remove"
+						autocomplete="off">
+					<label class="btn btn-outline-light" for="action-remove">Remove</label>
+				</div>
+
+				<input type="text" class="form-control mb-3" id="username" placeholder="Username" required>
+
+				<input type="password" class="form-control mb-3" id="token" placeholder="Token" required>
+
+				<button class="btn btn-primary w-100" type="submit" id="submit">Execute</button>
+			</form>
+			<div id="result" class="mx-auto text-start"></div>
+		</div>
+
+	</div>
+
+	<footer id="footer" class="bg-dark py-3">
+		<div class="container d-md-flex justify-content-between text-center text-white">
+			<div>&copy; <a class="link-light" href="https://artivain.com">Artivain</a> <span id="year"></span></div>
+			<div>This website is licensed under <a class="link-light" href="/LICENSE">MIT license</a></div>
+			<div><a class="link-light" href="https://github.com/Artivain/reseau-discord-website">See on GitHub</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+		crossorigin="anonymous"></script>
+
+	<script>
+		const result = document.getElementById("result");
+
+		async function reportAccount() {
+			const userId = document.getElementById("discord-id").value;
+			const list = document.querySelector('input[name="report-type"]:checked').value;
+			const action = document.querySelector('input[name="action"]:checked').value;
+			const username = document.getElementById("username").value;
+			const token = document.getElementById("token").value;
+			const submit = document.getElementById("submit");
+			loadingAnimation({ element: submit });
+
+			if (!isValidId(userId)) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("The Discord ID is not valid.", "warning");
+			}
+
+			if (list != "suspect" && list != "blacklist") {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("You must choose a list.", "danger");
+			}
+
+			if (action != "add" && action != "remove") {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("You must choose an action.", "danger");
+			}
+
+			const endpoint = action + "-" + list;
+
+			const response = await fetch(
+				`https://api-rd.artivain.com/v1/${endpoint}?id=${encodeURIComponent(userId)}&username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`
+			);
+
+			const data = await response.json();
+
+			if (response.status == 400) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("The Discord ID is not valid.", "warning");
+			}
+
+			if (response.status == 401) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("The credentials are invalid.", "warning");
+			}
+
+			if (response.status == 403) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("You do not have the required permissions for this action.", "warning");
+			}
+
+			if (response.status == 404) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert(`<strong class='font-monospace'>${userId}</strong> is not found on the list ${list},`, "info");
+			}
+
+			if (response.status >= 400) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("An error has occurred.", "danger");
+			}
+
+			if (data.added === true) {
+				createAlert(`<strong class='font-monospace'>${data.id}</strong> is now in the list ${list}.`);
+			} else if (data.removed === true) {
+				createAlert(`<strong class='font-monospace'>${data.id}</strong> has been removed from the list ${list}.`);
+			} else if (data.added === false) {
+				createAlert(`<strong class='font-monospace'>${data.id}</strong> was already in the list ${list}.`, "info");
+			} else if (data.removed === false) {
+				createAlert(`<strong class='font-monospace'>${userId}</strong> is not found on the list ${list},`, "info");
+			} else {
+				createAlert("An error has occurred.", "danger");
+			}
+			
+			loadingAnimation({ isLoading: false, element: submit });
+		}
+
+		async function createAlert(message = "", type = "success") {
+			const alert = document.createElement("div");
+			alert.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+			alert.role = "alert";
+			alert.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+			result.prepend(alert);
+		}
+
+		function loadingAnimation({ isLoading = true, string = "Execute", element }) {
+			if (!element || typeof element != "object") throw new Error("Element parameter unset or invalid.");
+
+			if (isLoading) {
+				const spinner = `
+				<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+				<span class="visually-hidden">Loading...</span>
+				`;
+
+				element.disabled = true;
+				element.innerHTML = spinner;
+			} else {
+				element.disabled = false;
+				element.innerText = string;
+			}
+		}
+
+		function isValidId(id) {
+			if (isNaN(id) || id.length < 18) return false;
+			return true;
+		}
+	</script>
+
+	<script>
+		document.getElementById("year").innerText = new Date().getFullYear();
+	</script>
+</body>
+
+</html>
