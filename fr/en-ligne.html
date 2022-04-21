@@ -44,7 +44,7 @@
 						<a class="nav-link" href="/fr">Accueil</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link active" aria-current="page" href="#">Signaler</a>
+						<a class="nav-link active" aria-current="page" href="#">Outil en ligne</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="api">API</a>
@@ -67,8 +67,15 @@
 
 	<div class="container my-5">
 
+		<h2>Outil en ligne</h2>
+		<p>
+			Cet outil rapide à utiliser pour les membres permet de facilement intéragir avec l'API.
+		</p>
+		<p>
+			Vous n'avez pas de code d'accès? Demandez-le maintenant en devant membre du réseau Artivain! Contactez-nous sur notre serveur Discord.
+		</p>
+
 		<div class="container bg-dark my-5 p-md-5 text-white text-center rounded">
-			<h2>Signaler un compte</h2>
 			<form action="javascript:reportAccount()" id="check-account" class="mw-300 mx-auto">
 				<input type="text" class="form-control mb-3" id="discord-id" placeholder="ID Discord" required>
 
@@ -82,6 +89,16 @@
 					<label class="btn btn-outline-danger" for="report-type-blacklist">Blacklist</label>
 				</div>
 
+				<div class="btn-group w-100 mb-3">
+					<input type="radio" class="btn-check" name="action" id="action-add" value="add"
+						autocomplete="off" required>
+					<label class="btn btn-outline-light" for="action-add">Ajouter</label>
+
+					<input type="radio" class="btn-check" name="action" id="action-remove" value="remove"
+						autocomplete="off">
+					<label class="btn btn-outline-light" for="action-remove">Retirer</label>
+				</div>
+
 				<input type="text" class="form-control mb-3" id="username" placeholder="Nom d'utilisateur" required>
 
 				<input type="password" class="form-control mb-3" id="token" placeholder="Code d'authentification" required>
@@ -90,12 +107,6 @@
 			</form>
 			<div id="result" class="mx-auto text-start"></div>
 		</div>
-
-		<h2>Aide</h2>
-		<p>
-			Le réseau Discord Artivain (ou réseau Artivain tout court) est une collaboration entre plusieurs serveurs Discord
-			partenaires pour améliorer la sécurité de ceux-ci, en plus de collaborer sur des projets.
-		</p>
 
 	</div>
 
@@ -116,7 +127,8 @@
 
 		async function reportAccount() {
 			const userId = document.getElementById("discord-id").value;
-			const action = document.querySelector('input[name="report-type"]:checked').value;
+			const list = document.querySelector('input[name="report-type"]:checked').value;
+			const action = document.querySelector('input[name="action"]:checked').value;
 			const username = document.getElementById("username").value;
 			const token = document.getElementById("token").value;
 			const submit = document.getElementById("submit");
@@ -127,19 +139,21 @@
 				return createAlert("Le ID Discord n'est pas valide.");
 			}
 
-			let response;
-			if (action == "suspect") {
-				response = await fetch(
-					`https://api-rd.artivain.com/v1/add-suspect?id=${encodeURIComponent(userId)}&username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`
-				);
-			} else if (action == "blacklist") {
-				response = await fetch(
-					`https://api-rd.artivain.com/v1/add-blacklist?id=${encodeURIComponent(userId)}&username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`
-				);
-			} else {
+			if (list != "suspect" && list != "blacklist") {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("Veuillez choisir une liste.", "danger");
+			}
+
+			if (action != "add" && action != "remove") {
 				loadingAnimation({ isLoading: false, element: submit });
 				return createAlert("Veuillez choisir une action.", "danger");
 			}
+
+			const endpoint = action + "-" + list;
+
+			const response = await fetch(
+				`https://api-rd.artivain.com/v1/${endpoint}?id=${encodeURIComponent(userId)}&username=${encodeURIComponent(username)}&token=${encodeURIComponent(token)}`
+			);
 
 			const data = await response.json();
 
@@ -153,15 +167,31 @@
 				return createAlert("Les informations d'authentification ne sont pas valides.", "warning");
 			}
 
-			if (response.status != 200) {
+			if (response.status == 403) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert("Vous n'avez pas les permissions requises pour cette action.", "warning");
+			}
+
+			if (response.status == 404) {
+				loadingAnimation({ isLoading: false, element: submit });
+				return createAlert(`<strong class='font-monospace'>${userId}</strong> est introuvable sur la liste ${list},`, "info");
+			}
+
+			if (response.status >= 400) {
 				loadingAnimation({ isLoading: false, element: submit });
 				return createAlert("Une erreur est survenue.", "danger");
 			}
 
-			if (data.added) {
-				createAlert(`<strong class='font-monospace'>${data.id}</strong> est maintenant ${action}.`);
+			if (data.added === true) {
+				createAlert(`<strong class='font-monospace'>${data.id}</strong> est maintenant dans la liste ${list}.`);
+			} else if (data.removed === true) {
+				createAlert(`<strong class='font-monospace'>${data.id}</strong> a été retiré de la liste ${list}.`);
+			} else if (data.added === false) {
+				createAlert(`<strong class='font-monospace'>${data.id}</strong> était déjà dans la liste ${list}.`, "info");
+			} else if (data.removed === false) {
+				createAlert(`<strong class='font-monospace'>${userId}</strong> est introuvable sur la liste ${list},`, "info");
 			} else {
-				createAlert(`<strong class='font-monospace'>${data.id}</strong> était déjà ${action}.`, "info");
+				createAlert("Une erreur est survenue.", "danger");
 			}
 			
 			loadingAnimation({ isLoading: false, element: submit });
