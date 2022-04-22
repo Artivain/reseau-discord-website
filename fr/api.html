@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Réseau Discord Artivain</title>
+	<link rel="shortcut icon" href="https://assets.artivain.com/fav/bots/ra-512.png">
+
+	<!-- The page supports both dark and light color schemes, and the default is light. -->
+	<meta name="color-scheme" content="light dark">
+
+	<script>
+		if (window.matchMedia("(prefers-color-scheme: dark)").media === "not all") {
+			document.documentElement.style.display = "none";
+			document.head.insertAdjacentHTML(
+				"beforeend",
+				"<link id=\"css\" rel=\"stylesheet\" href=\"/css/flatly-light.min.css\" onload=\"document.documentElement.style.display = ''\">"
+			);
+		}
+	</script>
+
+	<link rel="stylesheet" href="/css/flatly-dark.min.css" media="(prefers-color-scheme: dark)">
+	<link rel="stylesheet" href="/css/flatly-light.min.css" media="(prefers-color-scheme: light)">
+	<link rel="stylesheet" href="/css/prismjs.css">
+	<link rel="stylesheet" href="/css/style.css">
+
+	<style>
+		.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+			margin-top: inherit;
+		}
+	</style>
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark position-fixed top-0 w-100 bg-dark">
+		<div class="container">
+			<a class="navbar-brand" href="/">
+				<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="navbar-logo" alt="Logo">
+				Réseau Discord Artivain
+			</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+				aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" href="#">Accueil</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="en-ligne">Outil en ligne</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="api">API</a>
+					</li>
+					<li class="nav-item">
+						<a href="https://discord.artivain.com" class="nav-link">Serveur Discord</a>
+					</li>
+					<li class="nav-item">
+						<a href="/en/" class="nav-link">English</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid text-center text-white bg-dark py-5 mt-3">
+		<img src="https://assets.artivain.com/fav/bots/ra-512.png" class="img-fluid mw-200" alt="Logo">
+		<h1>Réseau Discord Artivain</h1>
+	</div>
+
+	<div class="container my-5" id="content">
+
+
+
+	</div>
+
+	<footer id="footer" class="bg-dark py-3">
+		<div class="container d-md-flex justify-content-between text-center text-white">
+			<div>&copy; <a class="link-light" href="https://artivain.com">Artivain</a> <span id="year"></span></div>
+			<div>Ce site est sous <a class="link-light" href="/LICENSE">licence MIT</a></div>
+			<div><a class="link-light" href="https://github.com/Artivain/reseau-discord-website">Voir sur GitHub</a></div>
+		</div>
+	</footer>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+		crossorigin="anonymous"></script>
+
+	<script>
+		document.getElementById("year").innerText = new Date().getFullYear();
+	</script>
+
+	<script src="/js/prism.js" data-manual></script>
+
+	<script type="module">
+		import showdown from "https://cdn.skypack.dev/showdown@^2.1.0";
+
+		const content = document.getElementById("content");
+
+		const request = await fetch("https://raw.githubusercontent.com/Artivain/reseau-discord-artivain-api/main/comment-utiliser.md");
+
+		if (request.status == 200) {
+			showdown.setFlavor("github");
+			const converter = new showdown.Converter({
+				simplifiedAutoLink: false,
+				underline: true,
+				openLinksInNewWindow: true,
+				backslashEscapesHTMLTags: true,
+				emoji: true,
+				ghMentions: true,
+				headerLevelStart: 2,
+				noHeaderId: false,
+				tablesHeaderId: false
+			});
+			const data = await request.text();
+			content.innerHTML = converter.makeHtml(data);
+			window.Prism.highlightAll();
+			content.querySelectorAll("table").forEach(table => table.classList.add("table"));
+		} else {
+			content.innerHTML = "Une erreur est survenue.";
+		}
+	</script>
+</body>
+
+</html>
